@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Georg Winterfeld | Technical Game Designer</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. LOCAL FONT (OPTIOnyx) --- */
+        @font-face {
+            font-family: 'Onyx';
+            src: url('OPTIOnyx.otf') format('opentype'); 
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* --- DESIGN SYSTEM --- */
+        :root {
+            --primary-font: 'Onyx', serif; 
+            --secondary-font: 'Montserrat', sans-serif;
+            
+            --header-size: clamp(3.5rem, 11vw, 9.5rem); 
+            --base-size: 16px;
+
+            --bg-color: #ece0c6;        
+            --primary-color: #1d1d1d;   
+            --secondary-color: #555555; 
+            --accent-color: #f06a53;    
+            
+            --card-bg: #f4ebd6;         
+            --card-border: #dcd2bb;     
+
+            --card-size: 180px; 
+            --gap-portfolio-title: 50px;
+            --gap-title-desc: 25px;
+            --project-text-gap: 3px;
+
+            --texture-opacity: 0.0;     
+            --texture-blur: 0px;
+            
+            --anim-duration: 0.8s;
+            --anim-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+            --layer-delay: 0.1s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { min-height: 100%; font-size: var(--base-size); }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--secondary-color);
+            font-family: var(--secondary-font);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+            font-weight: 400; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;        
+        }
+
+        /* --- BACKGROUND LAYERS --- */
+        .bg-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; background: var(--bg-color); pointer-events: none;
+        }
+
+        .texture-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; 
+            background-image: url('texture.jpg'); 
+            background-size: cover; background-position: center;
+            mix-blend-mode: multiply; opacity: var(--texture-opacity);
+            filter: blur(var(--texture-blur));
+        }
+
+        /* --- HEADER LAYER --- */
+        .fixed-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 20; pointer-events: none; perspective: 1200px;
+        }
+
+        .header-container {
+            text-align: center; z-index: 20;
+            display: flex; flex-direction: column; align-items: center;
+            width: 90%; max-width: 1400px;
+        }
+
+        /* BUTTON */
+        #enterBtn {
+            margin-top: -15px; 
+            padding: 15px 40px;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: var(--secondary-font);
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.5s ease;
+            
+            /* FIX: Visibility Hidden to prevent ghosting */
+            visibility: hidden;
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+
+        #enterBtn.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #enterBtn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            letter-spacing: 5px;
+        }
+
+        /* HEADER ELEMENTS */
+        .upper-header {
+            font-family: var(--secondary-font);
+            font-size: 1.2rem; letter-spacing: 4px; font-weight: 500; 
+            color: var(--accent-color); margin-bottom: var(--gap-portfolio-title); 
+            opacity: 0; display: flex; align-items: center; gap: 25px; 
+            will-change: transform, opacity;
+            --line-width: 0px; 
+        }
+        
+        .upper-header::before, .upper-header::after {
+            content: ""; height: 1px; 
+            width: var(--line-width); 
+            background: var(--accent-color); opacity: 0.5;
+        }
+
+        .title-block { display: flex; flex-direction: column; align-items: center; }
+
+        /* --- TITLE ANIMATION CSS --- */
+        .main-title {
+            font-family: var(--primary-font); font-weight: normal; 
+            font-size: var(--header-size); letter-spacing: 0px; text-transform: uppercase;
+            line-height: 0.8; color: var(--primary-color);
+            will-change: transform; margin: 0; white-space: nowrap; 
+            position: relative;
+        }
+
+        .char-mask {
+            display: inline-block;
+            overflow: visible; 
+            vertical-align: top;
+            position: relative;
+        }
+
+        .char-inner {
+            display: inline-block;
+            opacity: 0; 
+            transform: translateY(-60px); 
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease; 
+            will-change: transform, opacity;
+        }
+
+        .char-inner.in-view {
+            opacity: 1;
+            transform: translateY(0%);
+        }
+
+        .char-space {
+            display: inline-block;
+            width: 0.25em; 
+        }
+
+        /* --- SUBTITLE ANIMATION --- */
+        .lower-header {
+            font-family: var(--secondary-font); 
+            font-size: 0.85rem; 
+            font-weight: normal; 
+            color: var(--accent-color);
+            margin-top: 10px; 
+            
+            /* FIX: Visibility Hidden to prevent blur ghosting */
+            visibility: hidden;
+            opacity: 0; 
+            letter-spacing: 0px; 
+            transform: translateY(5px); 
+            filter: blur(4px); 
+            backface-visibility: hidden; 
+
+            /* Updated duration to 1.2s for snappier feel */
+            will-change: transform, opacity, letter-spacing, filter;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        
+        .lower-header.show {
+            visibility: visible;
+            opacity: 0.8;
+            letter-spacing: 3px; 
+            transform: translateY(0);
+            filter: blur(0px); 
+        }
+
+        .description-grid {
+            display: flex; justify-content: center; gap: 60px; 
+            align-items: flex-start; width: 100%; max-width: 800px;
+            margin-top: var(--gap-title-desc); 
+            opacity: 0; font-family: var(--secondary-font); color: var(--secondary-color);
+            will-change: opacity;
+        }
+
+        .desc-col {
+            width: 45%; font-size: 1rem; line-height: 1.6;
+            text-align: center; font-weight: 400; 
+            text-transform: uppercase; letter-spacing: 1px;
+            will-change: transform;
+        }
+
+        /* --- PROJECTS LAYER --- */
+        .projects-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 5; pointer-events: none; perspective: 2000px; 
+        }
+
+        .project-card {
+            position: absolute;
+            width: var(--card-size); height: var(--card-size);
+            will-change: transform, opacity;
+            overflow: visible; transform-style: preserve-3d;
+            opacity: 0; pointer-events: none;
+            cursor: pointer; 
+        }
+
+        .card-visual {
+            width: 100%; height: 100%;
+            background: transparent; 
+            border: none;
+            box-shadow: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: visible; 
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- ICON WRAPPER --- */
+        .icon-wrapper {
+            width: 100%; height: 100%;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(1);
+        }
+
+        .p1 .icon-wrapper { transform: scale(2.0); }
+
+        /* ORIGINAL BILD */
+        .card-img {
+            width: 100%; height: 100%;
+            object-fit: contain; 
+            display: block;
+            filter: grayscale(0%);
+            z-index: 1;
+        }
+
+        /* FÜLL-CONTAINER */
+        .fill-box {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 0%;
+            overflow: hidden; 
+            z-index: 2;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
+            pointer-events: none;
+        }
+
+        /* --- FIX: PROJECT 1 FILL SPEED (1.0s) --- */
+        .p1 .fill-box {
+            transition-duration: 1.0s; 
+        }
+
+        /* ORANGE KOPIE */
+        .fill-img {
+            width: 100%; 
+            height: var(--card-size); 
+            object-fit: contain;
+            position: absolute;
+            bottom: 0; left: 0;
+            filter: brightness(0) saturate(100%) invert(64%) sepia(66%) saturate(5437%) hue-rotate(327deg) brightness(96%) contrast(92%) drop-shadow(0px 0px 5px rgba(240, 106, 83, 0.5));
+            opacity: 0.8; 
+        }
+
+
+        /* --- TEXT INFOS --- */
+        .info-top, .info-bottom {
+            position: absolute; left: 50%; width: 250px; 
+            opacity: 0; transition: all 0.4s ease;
+            pointer-events: none; text-align: center;
+            transform: translateX(-50%);
+            z-index: 10; 
+        }
+
+        .info-top { bottom: 100%; margin-bottom: 20px; transform: translateX(-50%) translateY(10px); }
+        .info-bottom { top: 100%; margin-top: 20px; transform: translateX(-50%) translateY(-10px); }
+
+        .info-name {
+            font-family: var(--primary-font); font-weight: normal; 
+            font-size: 2.2rem; color: var(--primary-color);
+            line-height: 1; letter-spacing: 1px; margin-bottom: var(--project-text-gap); 
+        }
+
+        .info-genre {
+            font-family: var(--secondary-font); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            color: var(--accent-color); font-weight: normal; margin: 0;
+        }
+
+        .info-desc {
+            font-family: var(--secondary-font); font-size: 0.75rem;
+            color: var(--secondary-color); font-weight: 400;
+            margin-top: var(--project-text-gap); 
+            line-height: 1.35; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .project-card.active { pointer-events: auto !important; }
+
+        /* --- HOVER STATES --- */
+        
+        .project-card.active:hover .card-visual { transform: translateY(-8px); }
+
+        .project-card.active:hover .icon-wrapper { transform: scale(1.08); }
+        
+        /* P1 Scale Adjustment (2.0 -> 2.08) */
+        .project-card.active.p1:hover .icon-wrapper { transform: scale(2.08); }
+
+        .project-card.active:hover .fill-box { height: 100%; }
+
+        .project-card.active:hover .info-top,
+        .project-card.active:hover .info-bottom {
+            opacity: 1; transform: translateX(-50%) translateY(0);
+        }
+
+        /* Positions */
+        .p1 { top: 16%; left: 9%; }
+        .p2 { top: 11%; left: 51%; margin-left: calc(var(--card-size) / -2); }
+        .p3 { top: 14%; right: 11%; }
+        .p4 { bottom: 17%; left: 12%; }
+        .p5 { bottom: 19%; left: 49%; margin-left: calc(var(--card-size) / -2); }
+        .p6 { bottom: 14%; right: 9%; }
+
+
+        /* --- TRANSITION LAYER --- */
+        .transition-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--accent-color); 
+            z-index: 95; 
+            transform: translateY(100%);
+            transition: transform var(--anim-duration) var(--anim-curve);
+            transition-delay: var(--layer-delay); 
+        }
+        .transition-layer.is-open { transform: translateY(0%); transition-delay: 0s; }
+
+        /* --- PROJECT OVERLAY --- */
+        .project-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); 
+            z-index: 100;
+            transform: translateY(100%);
+            transition: transform var(--anim-duration) var(--anim-curve);
+            transition-delay: 0s; 
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px; overflow-y: auto; 
+        }
+        .project-overlay.is-open { transform: translateY(0%); transition-delay: var(--layer-delay); }
+
+        /* Overlay Inhalt */
+        .overlay-nav {
+            width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; margin-bottom: 40px;
+        }
+        .close-btn {
+            background: none; border: none;
+            font-family: var(--secondary-font); font-size: 0.8rem;
+            letter-spacing: 3px; color: var(--accent-color);
+            text-transform: uppercase; cursor: pointer; padding: 10px;
+            transition: opacity 0.3s;
+        }
+        .close-btn:hover { opacity: 0.6; }
+
+        .overlay-header {
+            text-align: center; opacity: 0; transform: translateY(20px);
+            transition: all 0.5s ease; transition-delay: 0s; 
+        }
+        .project-overlay.is-open .overlay-header {
+            opacity: 1; transform: translateY(0); transition-delay: 0.4s; 
+        }
+
+        .overlay-title {
+            font-family: var(--primary-font); font-size: clamp(3rem, 6vw, 5rem);
+            color: var(--primary-color); margin-bottom: 10px; line-height: 0.9;
+        }
+        .overlay-genre {
+            font-family: var(--secondary-font); font-size: 0.9rem;
+            color: var(--accent-color); letter-spacing: 3px;
+        }
+
+        footer {
+            height: 80px; position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--secondary-font); font-size: 0.7rem; letter-spacing: 3px;
+            opacity: 0.5; z-index: 5; color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 3rem; white-space: normal; line-height: 0.9; } 
+            .project-card { width: 120px; height: 120px; }
+            .info-top, .info-bottom { width: 180px; }
+            .description-grid { gap: 40px; flex-direction: column; align-items: center; }
+            .desc-col { width: 80%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer"></div>
+    <div class="texture-overlay"></div>
+
+    <div class="fixed-layer">
+        <div class="header-container" id="headerGroup">
+            <div class="upper-header" id="upperTag"><span>Portfolio</span></div>
+            <div class="title-block">
+                <h1 class="main-title" id="mainTitle">Georg Winterfeld</h1>
+                <p class="lower-header" id="lowerTag">Technical Game Designer</p>
+            </div>
+            <div class="description-grid" id="descGrid">
+                <p class="desc-col">Bridging the gap between creative vision and technical implementation.</p>
+                <p class="desc-col">Building the next generation of play through robust systems and immersive mechanics.</p>
+            </div>
+            <button id="enterBtn">Explore</button>
+        </div>
+    </div>
+
+    <div class="projects-grid">
+        <div class="project-card p1" data-vx="-150" data-vy="-200" data-rz="-15" data-rx="-20" data-stagger="0.0">
+            <div class="info-top"><h3 class="info-name">What Makes U a Monster?</h3><p class="info-genre">Point & Click Adventure</p></div>
+            <div class="card-visual">
+                <img src="project1.png" class="card-img" alt="Project 1">
+            </div>
+            <div class="info-bottom"><p class="info-desc">Narrative driven exploration of the human psyche.</p></div>
+        </div>
+
+        <div class="project-card p2" data-vx="40" data-vy="-250" data-rz="10" data-rx="-25" data-stagger="0.05">
+            <div class="info-top"><h3 class="info-name">GPM Diaries</h3><p class="info-genre">Serious Game</p></div>
+            <div class="card-visual"><img src="project2.png" class="card-img" alt="Project 2"></div>
+            <div class="info-bottom"><p class="info-desc">Self-assessment tool gamified for better engagement.</p></div>
+        </div>
+
+        <div class="project-card p3" data-vx="180" data-vy="-180" data-rz="-18" data-rx="-30" data-stagger="0.02">
+            <div class="info-top"><h3 class="info-name">Folc: The Blossom</h3><p class="info-genre">Action RPG</p></div>
+            <div class="card-visual"><img src="project3.png" class="card-img" alt="Project 3"></div>
+            <div class="info-bottom"><p class="info-desc">Fast paced combat in a stylized fantasy world.</p></div>
+        </div>
+
+        <div class="project-card p4" data-vx="-200" data-vy="150" data-rz="-25" data-rx="20" data-stagger="0.08">
+            <div class="info-top"><h3 class="info-name">Fall of Tenochtitlan</h3><p class="info-genre">Boomer Shooter</p></div>
+            <div class="card-visual"><img src="project4.png" class="card-img" alt="Project 4"></div>
+            <div class="info-bottom"><p class="info-desc">High octane retro shooter with modern mechanics.</p></div>
+        </div>
+
+        <div class="project-card p5" data-vx="-60" data-vy="250" data-rz="28" data-rx="15" data-stagger="0.1">
+            <div class="info-top"><h3 class="info-name">Coming Soon</h3><p class="info-genre">Prototype</p></div>
+            <div class="card-visual"><img src="project5.png" class="card-img" alt="Project 5"></div>
+            <div class="info-bottom"><p class="info-desc">Unannounced project currently in development.</p></div>
+        </div>
+
+        <div class="project-card p6" data-vx="140" data-vy="180" data-rz="12" data-rx="25" data-stagger="0.06">
+            <div class="info-top"><h3 class="info-name">Coming Soon</h3><p class="info-genre">R&D</p></div>
+            <div class="card-visual"><img src="project6.png" class="card-img" alt="Project 6"></div>
+            <div class="info-bottom"><p class="info-desc">Research and development for new game systems.</p></div>
+        </div>
+    </div>
+
+    <div class="transition-layer" id="transitionLayer"></div>
+
+    <div class="project-overlay" id="projectOverlay">
+        <nav class="overlay-nav"><button class="close-btn" id="closeOverlayBtn">Close [x]</button></nav>
+        <header class="overlay-header">
+            <h1 class="overlay-title" id="overlayTitle">Project Title</h1>
+            <p class="overlay-genre" id="overlayGenre">Genre / Type</p>
+        </header>
+        <div class="overlay-content"></div>
+    </div>
+
+    <footer>&copy; 2026 Georg Winterfeld</footer>
+
+    <script>
+        const mainTitle = document.getElementById('mainTitle');
+        const upperTag = document.getElementById('upperTag');
+        const lowerTag = document.getElementById('lowerTag');
+        const descGrid = document.getElementById('descGrid');
+        const descLeft = document.querySelector('.desc-col:nth-child(1)');
+        const descRight = document.querySelector('.desc-col:nth-child(2)');
+        const projects = document.querySelectorAll('.project-card');
+        const enterBtn = document.getElementById('enterBtn');
+        const overlay = document.getElementById('projectOverlay');
+        const transitionLayer = document.getElementById('transitionLayer'); 
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        const overlayTitle = document.getElementById('overlayTitle');
+        const overlayGenre = document.getElementById('overlayGenre');
+
+        // --- NEW: INITIAL REVEAL ANIMATION ---
+        function initTitleAnimation() {
+            // 1. Split Text
+            const text = mainTitle.innerText;
+            mainTitle.innerHTML = '';
+            
+            // 2. Create Masked Spans
+            [...text].forEach(char => {
+                if(char === ' ') {
+                    const space = document.createElement('span');
+                    space.className = 'char-space';
+                    mainTitle.appendChild(space);
+                } else {
+                    const mask = document.createElement('span');
+                    mask.className = 'char-mask';
+                    const inner = document.createElement('span');
+                    inner.className = 'char-inner';
+                    inner.innerText = char;
+                    mask.appendChild(inner);
+                    mainTitle.appendChild(mask);
+                }
+            });
+
+            // 3. Trigger Animations
+            setTimeout(() => {
+                const chars = document.querySelectorAll('.char-inner');
+                // Drop the letters
+                chars.forEach((char, i) => {
+                    setTimeout(() => {
+                        char.classList.add('in-view');
+                    }, i * 35);
+                });
+
+                // Wait for letters to finish before starting subtitle
+                const delayForSubtitle = chars.length * 35 + 100;
+
+                setTimeout(() => {
+                    // Start Subtitle (Technical Game Designer)
+                    if(lowerTag) lowerTag.classList.add('show');
+
+                    // Start Button part-way through subtitle
+                    // Shortened to 800ms for a snappier feel
+                    setTimeout(() => {
+                        if(enterBtn) enterBtn.classList.add('show');
+                    }, 500);
+
+                }, delayForSubtitle);
+                
+            }, 300); // Initial start delay
+        }
+
+        // --- AUTOMATIC CLONING SCRIPT FOR FILL EFFECT ---
+        projects.forEach(card => {
+            const visual = card.querySelector('.card-visual');
+            const img = card.querySelector('.card-img');
+            
+            if(visual && img) {
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('icon-wrapper');
+                
+                const fillBox = document.createElement('div');
+                fillBox.classList.add('fill-box');
+                
+                const fillImg = img.cloneNode(true);
+                fillImg.classList.remove('card-img');
+                fillImg.classList.add('fill-img');
+                
+                fillBox.appendChild(fillImg);
+                
+                visual.appendChild(wrapper);
+                wrapper.appendChild(img);
+                wrapper.appendChild(fillBox);
+            }
+        });
+
+        // --- INTERACTION ANIMATION LOGIC (EXPLORE CLICK) ---
+        function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+        function getSubProgress(t, start, end) {
+            if (t <= start) return 0;
+            if (t >= end) return 1;
+            return (t - start) / (end - start);
+        }
+
+        function renderScene(globalT) {
+            const titleT = getSubProgress(globalT, 0.0, 0.7);
+            if(mainTitle) mainTitle.style.transform = `scale(${1 + easeOutCubic(titleT) * 0.6})`;
+            
+            const lowerT = getSubProgress(globalT, 0.0, 0.6);
+            if(lowerTag) {
+                lowerTag.style.opacity = Math.max(0, 0.8 - easeOutCubic(lowerT));
+                lowerTag.style.transform = `translateY(${easeOutCubic(lowerT) * 40}px)`;
+            }
+
+            const upperT = getSubProgress(globalT, 0.2, 0.8);
+            const upperEase = easeOutCubic(upperT);
+            if(upperTag) {
+                upperTag.style.opacity = upperEase * 0.8;
+                upperTag.style.transform = `translateY(${-50 * (1 - upperEase)}px)`;
+                upperTag.style.setProperty('--line-width', `${80 * upperEase}px`);
+            }
+
+            const descT = getSubProgress(globalT, 0.3, 1.0);
+            const descEase = easeOutCubic(descT);
+            if(descGrid) descGrid.style.opacity = descEase * 0.8;
+            if(descLeft) descLeft.style.transform = `translateX(${-50 * (1 - descEase)}px)`;
+            if(descRight) descRight.style.transform = `translateX(${50 * (1 - descEase)}px)`;
+
+            const projectsEase = easeOutCubic(globalT);
+            projects.forEach((p) => {
+                const stagger = parseFloat(p.getAttribute('data-stagger'));
+                const localProgress = Math.max(0, Math.min(1, (projectsEase - stagger) / 0.85));
+                const invLocal = 1 - localProgress;
+                const vx = parseFloat(p.getAttribute('data-vx'));
+                const vy = parseFloat(p.getAttribute('data-vy'));
+                const rzBase = parseFloat(p.getAttribute('data-rz'));
+                const rxBase = parseFloat(p.getAttribute('data-rx'));
+                const offsetX = vx * invLocal;
+                const offsetY = vy * invLocal;
+                const curveX = Math.sin(invLocal * Math.PI) * (vx * 0.2);
+                const currentScale = 1 + (3.5 * invLocal);
+                const currentRotZ = invLocal * rzBase;
+                const currentRotX = invLocal * rxBase;
+
+                p.style.opacity = localProgress;
+                p.style.transform = `
+                    translate3d(${offsetX + curveX}px, ${offsetY}px, 0) 
+                    scale(${currentScale})
+                    rotateZ(${currentRotZ}deg)
+                    rotateX(${currentRotX}deg)
+                `;
+
+                if (localProgress >= 0.99) p.classList.add('active');
+                else p.classList.remove('active');
+            });
+        }
+
+        renderScene(0);
+
+        window.addEventListener('DOMContentLoaded', initTitleAnimation);
+
+        enterBtn.addEventListener('click', () => {
+            enterBtn.style.opacity = '0';
+            enterBtn.style.pointerEvents = 'none';
+            let startTime = null;
+            const duration = 1500; 
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                let t = Math.min(elapsed / duration, 1);
+                renderScene(t);
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        });
+
+        projects.forEach(card => {
+            card.addEventListener('click', () => {
+                if(!card.classList.contains('active')) return;
+                const title = card.querySelector('.info-name').innerText;
+                const genre = card.querySelector('.info-genre').innerText;
+                overlayTitle.innerText = title;
+                overlayGenre.innerText = genre;
+                transitionLayer.classList.add('is-open');
+                overlay.classList.add('is-open');
+            });
+        });
+
+        closeOverlayBtn.addEventListener('click', () => {
+            overlay.classList.remove('is-open');
+            transitionLayer.classList.remove('is-open');
+        });
+    </script>
+</body>
+</html>
