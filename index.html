@@ -108,7 +108,7 @@
             visibility: hidden;
             opacity: 0; 
             transform: translateY(20px); 
-            transform-origin: center center; /* Ensure it scales from middle */
+            transform-origin: center center; 
         }
 
         #enterBtn.show {
@@ -117,10 +117,19 @@
             transform: translateY(0);
         }
 
+        /* Hover State */
         #enterBtn:hover {
             background: var(--accent-color);
             color: var(--bg-color);
             letter-spacing: 5px;
+        }
+
+        /* CLICKED STATE (Locks the hover style during animation) */
+        #enterBtn.clicked {
+            background: var(--accent-color) !important;
+            color: var(--bg-color) !important;
+            letter-spacing: 5px !important;
+            border-color: var(--accent-color) !important;
         }
 
         /* HEADER ELEMENTS */
@@ -648,9 +657,13 @@
         window.addEventListener('DOMContentLoaded', initTitleAnimation);
 
         enterBtn.addEventListener('click', () => {
+            // LOCK THE HOVER STYLE
+            enterBtn.classList.add('clicked');
+            
             // New "Fly Into Screen" Effect
-            enterBtn.style.transition = "transform 0.6s ease-in, opacity 0.6s ease-in";
-            enterBtn.style.transform = "scale(10)";
+            // Overwrite transitions for the scale effect
+            enterBtn.style.transition = "transform 0.33s ease-out, opacity 0.33s ease-out";
+            enterBtn.style.transform = "scale(1.5)";
             enterBtn.style.opacity = '0';
             enterBtn.style.pointerEvents = 'none';
             
