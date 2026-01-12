@@ -104,10 +104,11 @@
             pointer-events: auto;
             transition: all 0.5s ease;
             
-            /* FIX: Visibility Hidden to prevent ghosting */
+            /* Initial Invisible State */
             visibility: hidden;
             opacity: 0; 
             transform: translateY(20px); 
+            transform-origin: center center; /* Ensure it scales from middle */
         }
 
         #enterBtn.show {
@@ -182,7 +183,7 @@
             color: var(--accent-color);
             margin-top: 10px; 
             
-            /* FIX: Visibility Hidden to prevent blur ghosting */
+            /* Initial Invisible State */
             visibility: hidden;
             opacity: 0; 
             letter-spacing: 0px; 
@@ -190,7 +191,6 @@
             filter: blur(4px); 
             backface-visibility: hidden; 
 
-            /* Updated duration to 1.2s for snappier feel */
             will-change: transform, opacity, letter-spacing, filter;
             transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); 
         }
@@ -548,8 +548,7 @@
                     // Start Subtitle (Technical Game Designer)
                     if(lowerTag) lowerTag.classList.add('show');
 
-                    // Start Button part-way through subtitle
-                    // Shortened to 800ms for a snappier feel
+                    // Start Button with 500ms delay after subtitle starts
                     setTimeout(() => {
                         if(enterBtn) enterBtn.classList.add('show');
                     }, 500);
@@ -649,8 +648,12 @@
         window.addEventListener('DOMContentLoaded', initTitleAnimation);
 
         enterBtn.addEventListener('click', () => {
+            // New "Fly Into Screen" Effect
+            enterBtn.style.transition = "transform 0.6s ease-in, opacity 0.6s ease-in";
+            enterBtn.style.transform = "scale(10)";
             enterBtn.style.opacity = '0';
             enterBtn.style.pointerEvents = 'none';
+            
             let startTime = null;
             const duration = 1500; 
             function step(timestamp) {
