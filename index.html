@@ -37,7 +37,7 @@
             --gap-title-desc: 25px;
             --project-text-gap: 3px;
 
-            --texture-opacity: 0.0;      
+            --texture-opacity: 0.0;       
             --texture-blur: 0px;
             
             --anim-duration: 0.8s;
@@ -54,6 +54,7 @@
             scrollbar-width: thin;
         }
 
+        /* --- CUSTOM SCROLLBAR --- */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb {
@@ -307,11 +308,8 @@
             line-height: 1.35; text-transform: uppercase; letter-spacing: 1px;
         }
 
-        /* --- FIX FOR PROJECT 1 GAP --- */
-        /* Reduces gap specifically for p1 to counteract image whitespace */
-        .p1 .info-desc {
-            margin-top: -30px !important;
-        }
+        /* --- FIX FOR PROJECT 1 DESCRIPTION GAP --- */
+        .p1 .info-desc { margin-top: -15px !important; }
 
         .project-card.active { pointer-events: auto !important; }
 
@@ -388,28 +386,38 @@
             color: var(--accent-color); letter-spacing: 3px; text-transform: uppercase;
         }
 
-        /* --- OVERLAY CONTENT STYLES --- */
+        /* --- OVERLAY CONTENT STYLES (PRELOADED) --- */
         .project-details {
             width: 100%; max-width: 1600px; 
-            opacity: 0; transform: translateY(20px);
-            animation: fadeInContent 0.8s ease forwards;
-            animation-delay: 0.6s; 
+            /* Start HIDDEN (Display None prevents interaction/layout issues) */
+            display: none; 
+            opacity: 0; 
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
         }
-        @keyframes fadeInContent {
-            to { opacity: 1; transform: translateY(0); }
+        
+        /* When ACTIVE, we switch to block and fade in */
+        .project-details.active {
+            display: block; 
+        }
+        
+        /* We separate display:block from the fade-in to allow transition */
+        .project-details.visible {
+            opacity: 1; 
+            transform: translateY(0);
         }
 
-        /* --- THE "ORBIT" LAYOUT (Optimized) --- */
+        /* --- THE "ORBIT" LAYOUT --- */
         .intro-layout {
             display: grid;
-            /* 65% Video | 35% Orbit Space */
+            /* 2fr Video | 1.2fr Orbit Space */
             grid-template-columns: 2fr 1.2fr; 
             gap: 40px;
             margin: 0 0 80px 0;
             align-items: stretch; 
         }
 
-        /* 1. Massive Video */
+        /* 1. Video Column */
         .video-col { width: 100%; }
         
         .video-wrapper {
@@ -419,16 +427,23 @@
             border: 1px solid var(--accent-color);
             box-shadow: 15px 15px 0px rgba(240, 106, 83, 0.15); 
         }
-        .video-wrapper video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* Style for video AND placeholder image */
+        .video-wrapper video,
+        .video-wrapper img.placeholder-img {
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block;
+        }
 
         /* 2. Orbit Dossier Column */
         .dossier-col {
             position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Vertically center the summary */
-            align-items: center; /* Horizontally center the summary */
-            min-height: 100%; /* Match video height */
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100%; 
         }
 
         /* The Sun: Summary Block */
@@ -449,16 +464,17 @@
              margin: 0;
         }
 
-        /* The Planets: Core Data (Absolute Positioning) */
+        /* The Planets: Core Data */
         .data-item {
             position: absolute;
             width: max-content;
+            /* GLOBAL: Left Border + Left Align */
             border-left: 2px solid var(--accent-color);
             padding-left: 15px;
             text-align: left;
         }
         
-        /* Position Logic */
+        /* Positioning */
         .pos-tl { top: 20%; left: 3%; }
         .pos-tr { top: 25%; right: 8%; }
         .pos-bl { bottom: 25%; left: 1%; }
@@ -480,7 +496,6 @@
             bottom: 20px; 
             left: 50%;
             transform: translateX(-50%);
-            
             display: inline-block; text-decoration: none;
             padding: 15px 40px;
             background: var(--accent-color);
@@ -497,7 +512,7 @@
             letter-spacing: 5px;
         }
 
-        /* --- CONTRIBUTION HEADER (FIXED SIZE LINES) --- */
+        /* --- CONTRIBUTION HEADER (FIXED WIDTH) --- */
         .contribution-title {
             font-family: var(--secondary-font); 
             font-size: 1rem; 
@@ -515,7 +530,7 @@
         .contribution-title::before, .contribution-title::after {
             content: ""; 
             height: 1px; 
-            width: 360px; /* UPDATED WIDTH */
+            width: 360px; /* FIXED WIDTH */
             background-color: var(--accent-color); 
             opacity: 0.5;
         }
@@ -542,10 +557,16 @@
         .accordion-header:hover .acc-title { transform: translateX(5px); color: var(--accent-color); }
         .accordion-header:hover .acc-label { transform: translateX(25px); color: var(--accent-color); }
         .accordion-item.is-open .accordion-body { max-height: 2000px; opacity: 1; margin-top: 40px; }
+        
+        /* PERFORMANCE BOOST: Content Visibility */
         .accordion-body {
             max-height: 0; opacity: 0; overflow: hidden;
             transition: max-height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
             text-align: left; width: 100%; max-width: 800px; 
+            
+            /* Optimization: Don't render offscreen content until needed */
+            content-visibility: auto; 
+            contain-intrinsic-size: 0 500px;
         }
 
         /* Content Layout */
@@ -680,7 +701,100 @@
             <h1 class="overlay-title" id="overlayTitle">Project Title</h1>
             <p class="overlay-genre" id="overlayGenre">Genre / Type</p>
         </header>
-        <div class="overlay-content"></div>
+        
+        <div class="overlay-content-stash">
+            
+            <div id="content-p1" class="project-details">
+                <div class="intro-layout">
+                    <div class="video-col">
+                        <div class="video-wrapper" id="video-container-p1">
+                            <img src="media/project1/project1.png" class="placeholder-img" alt="Trailer">
+                        </div>
+                    </div>
+                    
+                    <div class="dossier-col">
+                        <div class="summary-block">
+                            <p class="summary-text">A narrative-driven psychological adventure that challenges players to explore a surreal world and uncover hidden truths. As the lead technical designer, I focused on creating immersive systems that bridge the gap between traditional point & click mechanics and modern, tactile gameplay.</p>
+                        </div>
+                        <div class="data-item pos-tl"><h4>Role</h4><p>Programmer</p></div>
+                        <div class="data-item pos-tr"><h4>Team Size</h4><p>7 Devs</p></div>
+                        <div class="data-item pos-bl"><h4>Duration</h4><p>4 Months</p></div>
+                        <div class="data-item pos-br"><h4>Engine</h4><p>Unity</p></div>
+                        <a href="https://redlight-oracle.itch.io/what-makes-u-a-monster" target="_blank" class="itch-btn">Play on Itch.io</a>
+                    </div>
+                </div>
+
+                <h2 class="contribution-title">Contribution</h2>
+
+                <div class="accordion-container">
+                    <div class="accordion-item">
+                        <div class="accordion-header"><span class="acc-label">THE SYSTEM</span><h3 class="acc-title">Inventory System</h3></div>
+                        <div class="accordion-body">
+                            <div class="feature-block-inner">
+                                <div class="problem-solution-grid">
+                                    <div class="phase-col"><h3 class="phase-header">The Challenge</h3><p class="phase-text">The narrative required players to carry multiple puzzle items, but standard list-based inventories felt clinical. They often pulled the player out of the game world into a spreadsheet, breaking the atmospheric immersion we worked hard to build.</p></div>
+                                    <div class="phase-col"><h3 class="phase-header">The Solution</h3><p class="phase-text">I designed a grid-based drag-and-drop system. Players can physically grab items from a customizable hotbar and drag them directly into the scene to solve puzzles. This makes the interface feel like a tangible part of the world rather than an overlay.</p><div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div></div>
+                                </div>
+                                <div class="result-video-container"><h3 class="result-label">The Result</h3><div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block1_p1.mp4" type="video/mp4"></video></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header"><span class="acc-label">THE BREAK</span><h3 class="acc-title">Boxing Minigame</h3></div>
+                        <div class="accordion-body">
+                            <div class="feature-block-inner">
+                                <div class="problem-solution-grid">
+                                    <div class="phase-col"><h3 class="phase-header">The Challenge</h3><p class="phase-text">The game is a slow-paced psychological narrative. We realized players needed a way to break the tension and release energy without leaving the story context. Constant reading was becoming fatigue-inducing.</p></div>
+                                    <div class="phase-col"><h3 class="phase-header">The Solution</h3><p class="phase-text">I prototyped a rhythm-based boxing minigame. By using simple button-mashing inputs that scale in difficulty, we created a spike in engagement. It serves as a narrative device for the character's frustration while giving the player a mechanical break.</p><div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div></div>
+                                </div>
+                                <div class="result-video-container"><h3 class="result-label">The Result</h3><div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block2_p1.mp4" type="video/mp4"></video></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header"><span class="acc-label">THE WORLD</span><h3 class="acc-title">Interactive World</h3></div>
+                        <div class="accordion-body">
+                            <div class="feature-block-inner">
+                                <div class="problem-solution-grid">
+                                    <div class="phase-col"><h3 class="phase-header">The Challenge</h3><p class="phase-text">Purely visual environments often feel static. We needed the world itself to act as a narrative delivery device without forcing heavy text dumps or cutscenes on the player at every turn.</p></div>
+                                    <div class="phase-col"><h3 class="phase-header">The Solution</h3><p class="phase-text">I implemented an interaction system where every object has "discovery" states. Hovering reveals subtle cues, and clicking triggers character thoughts specific to that object's narrative weight, ensuring exploration is always rewarded with story context.</p><div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div></div>
+                                </div>
+                                <div class="result-video-container"><h3 class="result-label">The Result</h3><div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block3_p1.mp4" type="video/mp4"></video></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-p2" class="project-details">
+                <div class="video-wrapper" id="video-container-p2">
+                    <img src="media/project2/project2.png" class="placeholder-img" alt="Trailer">
+                </div>
+                <p style="text-align:center; margin-top:30px;">Template update coming soon...</p>
+            </div>
+
+            <div id="content-p3" class="project-details">
+                <div class="video-wrapper" id="video-container-p3">
+                     <img src="media/project3/project3.png" class="placeholder-img" alt="Trailer">
+                </div>
+                <p style="text-align:center; margin-top:30px;">Template update coming soon...</p>
+            </div>
+
+             <div id="content-p4" class="project-details">
+                <p style="text-align:center; margin-top:30px;">Coming Soon</p>
+            </div>
+
+             <div id="content-p5" class="project-details">
+                <p style="text-align:center; margin-top:30px;">Coming Soon</p>
+            </div>
+
+             <div id="content-p6" class="project-details">
+                <p style="text-align:center; margin-top:30px;">Coming Soon</p>
+            </div>
+
+        </div>
     </div>
 
     <footer>&copy; 2026 Georg Winterfeld</footer>
@@ -699,136 +813,37 @@
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
         const overlayTitle = document.getElementById('overlayTitle');
         const overlayGenre = document.getElementById('overlayGenre');
-        const overlayContent = document.querySelector('.overlay-content');
-
-        // --- PROJECT CONTENT DATA ---
+        
+        // --- DATA STORE ---
+        // (Just Metadata now, content is in HTML)
         const projectData = {
             "p1": {
                 title: "What Makes U a Monster?",
                 genre: "Point & Click Adventure",
-                content: `
-                    <div class="project-details">
-                        
-                        <div class="intro-layout">
-                            
-                            <div class="video-col">
-                                <div class="video-wrapper">
-                                    <video controls autoplay muted playsinline poster="media/project1/project1.png">
-                                        <source src="media/project1/trailer_p1.mp4" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </div>
-                            </div>
-                            
-                            <div class="dossier-col">
-                                
-                                <div class="summary-block">
-                                    <p class="summary-text">A narrative-driven psychological adventure that challenges players to explore a surreal world and uncover hidden truths. As the lead technical designer, I focused on creating immersive systems that bridge the gap between traditional point & click mechanics and modern, tactile gameplay.</p>
-                                </div>
-
-                                <div class="data-item pos-tl"><h4>Role</h4><p>Programmer</p></div>
-                                <div class="data-item pos-tr"><h4>Team Size</h4><p>7 Devs</p></div>
-                                <div class="data-item pos-bl"><h4>Duration</h4><p>4 Months</p></div>
-                                <div class="data-item pos-br"><h4>Engine</h4><p>Unity</p></div>
-
-                                <a href="https://redlight-oracle.itch.io/what-makes-u-a-monster" target="_blank" class="itch-btn">Play on Itch.io</a>
-                            </div>
-
-                        </div>
-
-                        <h2 class="contribution-title">Contribution</h2>
-
-                        <div class="accordion-container">
-                            
-                            <div class="accordion-item">
-                                <div class="accordion-header">
-                                    <span class="acc-label">THE SYSTEM</span>
-                                    <h3 class="acc-title">Inventory System</h3>
-                                </div>
-                                <div class="accordion-body">
-                                    <div class="feature-block-inner">
-                                        <div class="problem-solution-grid">
-                                            <div class="phase-col">
-                                                <h3 class="phase-header">The Challenge</h3>
-                                                <p class="phase-text">The narrative required players to carry multiple puzzle items, but standard list-based inventories felt clinical. They often pulled the player out of the game world into a spreadsheet, breaking the atmospheric immersion we worked hard to build.</p>
-                                            </div>
-                                            <div class="phase-col">
-                                                <h3 class="phase-header">The Solution</h3>
-                                                <p class="phase-text">I designed a grid-based drag-and-drop system. Players can physically grab items from a customizable hotbar and drag them directly into the scene to solve puzzles. This makes the interface feel like a tangible part of the world rather than an overlay.</p>
-                                                <div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div>
-                                            </div>
-                                        </div>
-                                        <div class="result-video-container">
-                                            <h3 class="result-label">The Result</h3>
-                                            <div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block1_p1.mp4" type="video/mp4"></video></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-item">
-                                <div class="accordion-header">
-                                    <span class="acc-label">THE BREAK</span>
-                                    <h3 class="acc-title">Boxing Minigame</h3>
-                                </div>
-                                <div class="accordion-body">
-                                    <div class="feature-block-inner">
-                                        <div class="problem-solution-grid">
-                                            <div class="phase-col">
-                                                <h3 class="phase-header">The Challenge</h3>
-                                                <p class="phase-text">The game is a slow-paced psychological narrative. We realized players needed a way to break the tension and release energy without leaving the story context. Constant reading was becoming fatigue-inducing.</p>
-                                            </div>
-                                            <div class="phase-col">
-                                                <h3 class="phase-header">The Solution</h3>
-                                                <p class="phase-text">I prototyped a rhythm-based boxing minigame. By using simple button-mashing inputs that scale in difficulty, we created a spike in engagement. It serves as a narrative device for the character's frustration while giving the player a mechanical break.</p>
-                                                <div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div>
-                                            </div>
-                                        </div>
-                                        <div class="result-video-container">
-                                            <h3 class="result-label">The Result</h3>
-                                            <div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block2_p1.mp4" type="video/mp4"></video></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-item">
-                                <div class="accordion-header">
-                                    <span class="acc-label">THE WORLD</span>
-                                    <h3 class="acc-title">Interactive World</h3>
-                                </div>
-                                <div class="accordion-body">
-                                    <div class="feature-block-inner">
-                                        <div class="problem-solution-grid">
-                                            <div class="phase-col">
-                                                <h3 class="phase-header">The Challenge</h3>
-                                                <p class="phase-text">Purely visual environments often feel static. We needed the world itself to act as a narrative delivery device without forcing heavy text dumps or cutscenes on the player at every turn.</p>
-                                            </div>
-                                            <div class="phase-col">
-                                                <h3 class="phase-header">The Solution</h3>
-                                                <p class="phase-text">I implemented an interaction system where every object has "discovery" states. Hovering reveals subtle cues, and clicking triggers character thoughts specific to that object's narrative weight, ensuring exploration is always rewarded with story context.</p>
-                                                <div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div>
-                                            </div>
-                                        </div>
-                                        <div class="result-video-container">
-                                            <h3 class="result-label">The Result</h3>
-                                            <div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block3_p1.mp4" type="video/mp4"></video></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                `
+                contentId: "content-p1",
+                videoContainerId: "video-container-p1",
+                videoSrc: "media/project1/trailer_p1.mp4",
+                videoPoster: "media/project1/project1.png"
             },
-
-            // --- PLACEHOLDERS FOR P2 & P3 ---
-            "p2": { title: "GPM Diaries", genre: "Serious Game", content: "<div class='project-details'><div class='video-wrapper'><video controls autoplay muted playsinline poster='media/project2/project2.png'><source src='media/project2/trailer_p2.mp4' type='video/mp4'></video></div><p style='text-align:center;'>Template update coming soon...</p></div>" },
-            "p3": { title: "Folc: The Blossom", genre: "Action RPG", content: "<div class='project-details'><div class='video-wrapper'><video controls autoplay muted playsinline poster='media/project3/project3.png'><source src='media/project3/trailer_p3.mp4' type='video/mp4'></video></div><p style='text-align:center;'>Template update coming soon...</p></div>" },
-            "p4": { title: "Fall of Tenochtitlan", genre: "Boomer Shooter", content: "<div class='project-details'><p style='text-align:center;'>Coming Soon</p></div>" },
-            "p5": { title: "Coming Soon", genre: "Prototype", content: "<div class='project-details'><p style='text-align:center;'>Coming Soon</p></div>" },
-            "p6": { title: "Coming Soon", genre: "R&D", content: "<div class='project-details'><p style='text-align:center;'>Coming Soon</p></div>" }
+            "p2": {
+                title: "GPM Diaries",
+                genre: "Serious Game",
+                contentId: "content-p2",
+                videoContainerId: "video-container-p2",
+                videoSrc: "media/project2/trailer_p2.mp4",
+                videoPoster: "media/project2/project2.png"
+            },
+            "p3": {
+                title: "Folc: The Blossom",
+                genre: "Action RPG",
+                contentId: "content-p3",
+                videoContainerId: "video-container-p3",
+                videoSrc: "media/project3/trailer_p3.mp4",
+                videoPoster: "media/project3/project3.png"
+            },
+            "p4": { title: "Fall of Tenochtitlan", genre: "Boomer Shooter", contentId: "content-p4" },
+            "p5": { title: "Coming Soon", genre: "Prototype", contentId: "content-p5" },
+            "p6": { title: "Coming Soon", genre: "R&D", contentId: "content-p6" }
         };
 
         // --- TITLE ANIMATION ---
@@ -954,7 +969,12 @@
             const items = document.querySelectorAll('.accordion-item');
             items.forEach(item => {
                 const header = item.querySelector('.accordion-header');
-                header.addEventListener('click', () => {
+                // Remove old listeners to prevent duplication if init is called multiple times
+                // (In this new architecture, we actually only need to init once, but safe to keep)
+                const newHeader = header.cloneNode(true);
+                header.parentNode.replaceChild(newHeader, header);
+                
+                newHeader.addEventListener('click', () => {
                     items.forEach(other => {
                         if(other !== item) other.classList.remove('is-open');
                     });
@@ -962,8 +982,12 @@
                 });
             });
         }
+        // Run once on load to prep the hidden DOM
+        initOverlayInteractions();
 
-        // --- PROJECT CLICK (UPDATED) ---
+        // --- PROJECT CLICK (ZERO LAG PRE-RENDER) ---
+        let currentActiveContent = null;
+
         projects.forEach(card => {
             card.addEventListener('click', () => {
                 if(!card.classList.contains('active')) return;
@@ -975,24 +999,93 @@
 
                 if(projectKey) {
                     const data = projectData[projectKey];
+                    
+                    // 1. SET HEADER
                     overlayTitle.innerText = data.title;
                     overlayGenre.innerText = data.genre; 
                     
-                    // Inject Content
-                    overlayContent.innerHTML = data.content; 
+                    // 2. FIND PRE-LOADED CONTENT
+                    const contentEl = document.getElementById(data.contentId);
                     
-                    // Init Accordion
-                    initOverlayInteractions();
-
+                    // 3. START TRANSITION
                     transitionLayer.classList.add('is-open');
                     overlay.classList.add('is-open');
+
+                    // 4. ACTIVATE CONTENT (After slide covers screen)
+                    setTimeout(() => {
+                        if(contentEl) {
+                            // Hide previous if exists
+                            if(currentActiveContent && currentActiveContent !== contentEl) {
+                                currentActiveContent.classList.remove('active');
+                                currentActiveContent.classList.remove('visible');
+                            }
+                            
+                            // SHOW current (Display Block)
+                            contentEl.classList.add('active');
+                            currentActiveContent = contentEl;
+
+                            // Force Reflow
+                            void contentEl.offsetHeight;
+
+                            // FADE IN (Opacity 1)
+                            contentEl.classList.add('visible');
+                        }
+
+                        // 5. INJECT VIDEO (Dynamic to save memory)
+                        if(data.videoSrc && data.videoContainerId) {
+                            const container = document.getElementById(data.videoContainerId);
+                            // Only inject if not already there
+                            if(container && !container.querySelector('video')) {
+                                 const video = document.createElement('video');
+                                 video.src = data.videoSrc;
+                                 video.poster = data.videoPoster;
+                                 video.controls = true;
+                                 video.muted = true;
+                                 video.playsInline = true;
+                                 video.autoplay = true; 
+                                 video.style.width = "100%";
+                                 video.style.height = "100%";
+                                 video.style.objectFit = "cover";
+                                 video.style.display = "block";
+                                 
+                                 container.innerHTML = ''; // Remove placeholder
+                                 container.appendChild(video);
+                            } else if (container) {
+                                // If video exists, just play it
+                                const existingVideo = container.querySelector('video');
+                                if(existingVideo) existingVideo.play();
+                            }
+                        }
+
+                    }, 500); 
                 }
             });
         });
 
+        // --- OPTIMIZED CLOSE ---
         closeOverlayBtn.addEventListener('click', () => {
+            // 1. Pause Videos
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => v.pause());
+
+            // 2. Fade Out Content
+            if(currentActiveContent) {
+                currentActiveContent.classList.remove('visible');
+            }
+
+            // 3. Slide Down
             overlay.classList.remove('is-open');
             transitionLayer.classList.remove('is-open');
+            
+            // 4. Hide DOM (Display None) after animation
+            setTimeout(() => {
+                if(currentActiveContent) {
+                    currentActiveContent.classList.remove('active');
+                    currentActiveContent = null;
+                }
+                // Optional: remove videos to save memory, or keep them paused
+                // For maximum performance on re-open, we can keep them.
+            }, 800);
         });
     </script>
 </body>
