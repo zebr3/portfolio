@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Georg Winterfeld | Technical Game Designer</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 1. LOCAL FONT (OPTIOnyx) --- */
+        /* --- 1. LOCAL FONT (Onyx) --- */
         @font-face {
             font-family: 'Onyx';
             src: url('OPTIOnyx.otf') format('opentype'); 
@@ -30,14 +30,14 @@
             --accent-color: #f06a53;    
             
             --card-bg: #f4ebd6;         
-            --card-border: #dcd2bb;     
+            --card-border: #dcd2bb;      
 
             --card-size: 180px; 
             --gap-portfolio-title: 50px;
             --gap-title-desc: 25px;
             --project-text-gap: 3px;
 
-            --texture-opacity: 0.0;     
+            --texture-opacity: 0.0;      
             --texture-blur: 0px;
             
             --anim-duration: 0.8s;
@@ -47,7 +47,21 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html { min-height: 100%; font-size: var(--base-size); }
+        html { 
+            min-height: 100%; 
+            font-size: var(--base-size);
+            scrollbar-color: var(--primary-color) var(--bg-color);
+            scrollbar-width: thin;
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color) !important; 
+            border: 2px solid var(--bg-color); 
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--accent-color) !important; }
 
         body {
             background-color: var(--bg-color);
@@ -104,7 +118,6 @@
             pointer-events: auto;
             transition: all 0.5s ease;
             
-            /* Initial Invisible State */
             visibility: hidden;
             opacity: 0; 
             transform: translateY(20px); 
@@ -117,14 +130,12 @@
             transform: translateY(0);
         }
 
-        /* Hover State */
         #enterBtn:hover {
             background: var(--accent-color);
             color: var(--bg-color);
             letter-spacing: 5px;
         }
 
-        /* CLICKED STATE (Locks the hover style during animation) */
         #enterBtn.clicked {
             background: var(--accent-color) !important;
             color: var(--bg-color) !important;
@@ -179,10 +190,7 @@
             transform: translateY(0%);
         }
 
-        .char-space {
-            display: inline-block;
-            width: 0.25em; 
-        }
+        .char-space { display: inline-block; width: 0.25em; }
 
         /* --- SUBTITLE ANIMATION --- */
         .lower-header {
@@ -191,24 +199,18 @@
             font-weight: normal; 
             color: var(--accent-color);
             margin-top: 10px; 
-            
-            /* Initial Invisible State */
-            visibility: hidden;
-            opacity: 0; 
+            visibility: hidden; opacity: 0; 
             letter-spacing: 0px; 
             transform: translateY(5px); 
             filter: blur(4px); 
             backface-visibility: hidden; 
-
             will-change: transform, opacity, letter-spacing, filter;
             transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); 
         }
         
         .lower-header.show {
-            visibility: visible;
-            opacity: 0.8;
-            letter-spacing: 3px; 
-            transform: translateY(0);
+            visibility: visible; opacity: 0.8;
+            letter-spacing: 3px; transform: translateY(0);
             filter: blur(0px); 
         }
 
@@ -244,70 +246,45 @@
 
         .card-visual {
             width: 100%; height: 100%;
-            background: transparent; 
-            border: none;
-            box-shadow: none;
+            background: transparent; border: none; box-shadow: none;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: visible; 
-            position: relative;
-            z-index: 1;
+            overflow: visible; position: relative; z-index: 1;
         }
 
-        /* --- ICON WRAPPER --- */
         .icon-wrapper {
-            width: 100%; height: 100%;
-            position: relative;
+            width: 100%; height: 100%; position: relative;
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform: scale(1);
         }
-
         .p1 .icon-wrapper { transform: scale(2.0); }
 
-        /* ORIGINAL BILD */
         .card-img {
-            width: 100%; height: 100%;
-            object-fit: contain; 
-            display: block;
-            filter: grayscale(0%);
-            z-index: 1;
+            width: 100%; height: 100%; object-fit: contain; 
+            display: block; filter: grayscale(0%); z-index: 1;
         }
 
-        /* FÜLL-CONTAINER */
         .fill-box {
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; height: 0%;
-            overflow: hidden; 
-            z-index: 2;
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+            overflow: hidden; z-index: 2;
             transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
             pointer-events: none;
         }
+        .p1 .fill-box { transition-duration: 1.0s; }
 
-        /* --- FIX: PROJECT 1 FILL SPEED (1.0s) --- */
-        .p1 .fill-box {
-            transition-duration: 1.0s; 
-        }
-
-        /* ORANGE KOPIE */
         .fill-img {
-            width: 100%; 
-            height: var(--card-size); 
-            object-fit: contain;
-            position: absolute;
-            bottom: 0; left: 0;
+            width: 100%; height: var(--card-size); object-fit: contain;
+            position: absolute; bottom: 0; left: 0;
             filter: brightness(0) saturate(100%) invert(64%) sepia(66%) saturate(5437%) hue-rotate(327deg) brightness(96%) contrast(92%) drop-shadow(0px 0px 5px rgba(240, 106, 83, 0.5));
             opacity: 0.8; 
         }
-
 
         /* --- TEXT INFOS --- */
         .info-top, .info-bottom {
             position: absolute; left: 50%; width: 250px; 
             opacity: 0; transition: all 0.4s ease;
             pointer-events: none; text-align: center;
-            transform: translateX(-50%);
-            z-index: 10; 
+            transform: translateX(-50%); z-index: 10; 
         }
 
         .info-top { bottom: 100%; margin-bottom: 20px; transform: translateX(-50%) translateY(10px); }
@@ -318,13 +295,11 @@
             font-size: 2.2rem; color: var(--primary-color);
             line-height: 1; letter-spacing: 1px; margin-bottom: var(--project-text-gap); 
         }
-
         .info-genre {
             font-family: var(--secondary-font); font-size: 0.7rem;
             text-transform: uppercase; letter-spacing: 2px;
             color: var(--accent-color); font-weight: normal; margin: 0;
         }
-
         .info-desc {
             font-family: var(--secondary-font); font-size: 0.75rem;
             color: var(--secondary-color); font-weight: 400;
@@ -332,19 +307,19 @@
             line-height: 1.35; text-transform: uppercase; letter-spacing: 1px;
         }
 
+        /* --- FIX FOR PROJECT 1 GAP --- */
+        /* Reduces gap specifically for p1 to counteract image whitespace */
+        .p1 .info-desc {
+            margin-top: -30px !important;
+        }
+
         .project-card.active { pointer-events: auto !important; }
 
         /* --- HOVER STATES --- */
-        
         .project-card.active:hover .card-visual { transform: translateY(-8px); }
-
         .project-card.active:hover .icon-wrapper { transform: scale(1.08); }
-        
-        /* P1 Scale Adjustment (2.0 -> 2.08) */
         .project-card.active.p1:hover .icon-wrapper { transform: scale(2.08); }
-
         .project-card.active:hover .fill-box { height: 100%; }
-
         .project-card.active:hover .info-top,
         .project-card.active:hover .info-bottom {
             opacity: 1; transform: translateX(-50%) translateY(0);
@@ -357,7 +332,6 @@
         .p4 { bottom: 17%; left: 12%; }
         .p5 { bottom: 19%; left: 49%; margin-left: calc(var(--card-size) / -2); }
         .p6 { bottom: 14%; right: 9%; }
-
 
         /* --- TRANSITION LAYER --- */
         .transition-layer {
@@ -383,9 +357,8 @@
         }
         .project-overlay.is-open { transform: translateY(0%); transition-delay: var(--layer-delay); }
 
-        /* Overlay Inhalt */
         .overlay-nav {
-            width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; margin-bottom: 40px;
+            width: 100%; max-width: 1400px; display: flex; justify-content: flex-end; margin-bottom: 30px;
         }
         .close-btn {
             background: none; border: none;
@@ -399,6 +372,7 @@
         .overlay-header {
             text-align: center; opacity: 0; transform: translateY(20px);
             transition: all 0.5s ease; transition-delay: 0s; 
+            margin-bottom: 50px;
         }
         .project-overlay.is-open .overlay-header {
             opacity: 1; transform: translateY(0); transition-delay: 0.4s; 
@@ -408,10 +382,199 @@
             font-family: var(--primary-font); font-size: clamp(3rem, 6vw, 5rem);
             color: var(--primary-color); margin-bottom: 10px; line-height: 0.9;
         }
+        
         .overlay-genre {
             font-family: var(--secondary-font); font-size: 0.9rem;
-            color: var(--accent-color); letter-spacing: 3px;
+            color: var(--accent-color); letter-spacing: 3px; text-transform: uppercase;
         }
+
+        /* --- OVERLAY CONTENT STYLES --- */
+        .project-details {
+            width: 100%; max-width: 1600px; 
+            opacity: 0; transform: translateY(20px);
+            animation: fadeInContent 0.8s ease forwards;
+            animation-delay: 0.6s; 
+        }
+        @keyframes fadeInContent {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- THE "ORBIT" LAYOUT (Optimized) --- */
+        .intro-layout {
+            display: grid;
+            /* 65% Video | 35% Orbit Space */
+            grid-template-columns: 2fr 1.2fr; 
+            gap: 40px;
+            margin: 0 0 80px 0;
+            align-items: stretch; 
+        }
+
+        /* 1. Massive Video */
+        .video-col { width: 100%; }
+        
+        .video-wrapper {
+            width: 100%; 
+            aspect-ratio: 16 / 9;
+            background: #000; 
+            border: 1px solid var(--accent-color);
+            box-shadow: 15px 15px 0px rgba(240, 106, 83, 0.15); 
+        }
+        .video-wrapper video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* 2. Orbit Dossier Column */
+        .dossier-col {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Vertically center the summary */
+            align-items: center; /* Horizontally center the summary */
+            min-height: 100%; /* Match video height */
+        }
+
+        /* The Sun: Summary Block */
+        .summary-block {
+            text-align: center;
+            width: 100%; 
+            max-width: 100%; 
+            z-index: 2;
+            padding: 20px 0; 
+        }
+        .summary-text {
+             font-family: var(--secondary-font); 
+             font-size: 0.95rem;
+             line-height: 1.7; 
+             color: var(--primary-color); 
+             text-transform: none; 
+             font-weight: 500;
+             margin: 0;
+        }
+
+        /* The Planets: Core Data (Absolute Positioning) */
+        .data-item {
+            position: absolute;
+            width: max-content;
+            border-left: 2px solid var(--accent-color);
+            padding-left: 15px;
+            text-align: left;
+        }
+        
+        /* Position Logic */
+        .pos-tl { top: 20%; left: 3%; }
+        .pos-tr { top: 25%; right: 8%; }
+        .pos-bl { bottom: 25%; left: 1%; }
+        .pos-br { bottom: 22%; right: 5%; }
+
+        .data-item h4 {
+            font-family: var(--secondary-font); font-size: 0.7rem;
+            color: var(--accent-color); letter-spacing: 2px;
+            margin-bottom: 2px; text-transform: uppercase;
+        }
+        .data-item p {
+            font-family: var(--primary-font); font-size: 2rem;
+            color: var(--primary-color); line-height: 0.9;
+        }
+
+        /* Button: Bottom Center */
+        .itch-btn {
+            position: absolute;
+            bottom: 20px; 
+            left: 50%;
+            transform: translateX(-50%);
+            
+            display: inline-block; text-decoration: none;
+            padding: 15px 40px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            font-family: var(--secondary-font);
+            font-size: 0.85rem; letter-spacing: 3px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent-color);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .itch-btn:hover {
+            background: transparent; color: var(--accent-color);
+            letter-spacing: 5px;
+        }
+
+        /* --- CONTRIBUTION HEADER (FIXED SIZE LINES) --- */
+        .contribution-title {
+            font-family: var(--secondary-font); 
+            font-size: 1rem; 
+            letter-spacing: 4px; 
+            color: var(--accent-color); 
+            text-transform: uppercase;
+            text-align: center;
+            margin: 0 0 40px 0; 
+            display: flex; align-items: center; 
+            justify-content: center;
+            gap: 20px; 
+            width: 100%;
+        }
+
+        .contribution-title::before, .contribution-title::after {
+            content: ""; 
+            height: 1px; 
+            width: 360px; /* UPDATED WIDTH */
+            background-color: var(--accent-color); 
+            opacity: 0.5;
+        }
+
+        /* --- SCATTERED ACCORDION STYLES --- */
+        .accordion-container { display: flex; flex-direction: column; gap: 80px; padding-bottom: 100px; }
+        .accordion-item { width: auto; display: flex; flex-direction: column; border: none; }
+        
+        /* UPDATED MARGINS */
+        .accordion-item:nth-child(1) { align-self: flex-start; margin-left: 18%; }
+        .accordion-item:nth-child(2) { align-self: flex-end; margin-right: 2%; text-align: right; }
+        .accordion-item:nth-child(2) .accordion-header { align-items: flex-start; }
+        .accordion-item:nth-child(3) { align-self: flex-start; margin-left: 27%; }
+        
+        .accordion-header { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; width: fit-content; }
+        .acc-label {
+            font-family: var(--secondary-font); font-size: 0.85rem; color: var(--accent-color); margin-bottom: 5px; letter-spacing: 2px;
+            align-self: flex-start; transition: transform 0.3s ease-out, color 0.175s ease;
+        }
+        .acc-title {
+            font-family: var(--primary-font); font-size: clamp(3rem, 5vw, 6rem); color: var(--primary-color);
+            line-height: 0.8; margin: 0; transition: transform 0.3s ease-out, color 0.175s ease;
+        }
+        .accordion-header:hover .acc-title { transform: translateX(5px); color: var(--accent-color); }
+        .accordion-header:hover .acc-label { transform: translateX(25px); color: var(--accent-color); }
+        .accordion-item.is-open .accordion-body { max-height: 2000px; opacity: 1; margin-top: 40px; }
+        .accordion-body {
+            max-height: 0; opacity: 0; overflow: hidden;
+            transition: max-height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+            text-align: left; width: 100%; max-width: 800px; 
+        }
+
+        /* Content Layout */
+        .feature-block-inner { padding-top: 20px; border-top: 1px solid var(--accent-color); }
+        .problem-solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .phase-col { display: flex; flex-direction: column; gap: 20px; }
+        .phase-header {
+            font-family: var(--secondary-font); font-size: 0.8rem; color: var(--accent-color); font-weight: 600; 
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px;
+        }
+        .phase-text {
+            font-family: var(--secondary-font); font-size: 0.95rem; line-height: 1.7; 
+            color: var(--secondary-color); text-transform: none; letter-spacing: 0.5px;
+        }
+        .sketch-box {
+            width: 100%; margin-top: 10px; border: 1px dashed var(--secondary-color);
+            background: rgba(0,0,0,0.03); padding: 10px;
+        }
+        .sketch-img { width: 100%; height: auto; display: block; opacity: 0.9; }
+        .result-video-container { width: 100%; margin-top: 20px; }
+        .result-label {
+            text-align: center; font-family: var(--primary-font); 
+            font-size: 2rem; margin-bottom: 15px; color: var(--primary-color);
+        }
+        .video-box-full {
+            width: 100%; aspect-ratio: 16/9;
+            background: #000; border: 1px solid var(--accent-color);
+        }
+        .video-box-full video { width: 100%; height: 100%; object-fit: cover; }
 
         footer {
             height: 80px; position: fixed; bottom: 0; left: 0; width: 100%;
@@ -420,12 +583,34 @@
             opacity: 0.5; z-index: 5; color: var(--primary-color);
         }
 
+        @media (max-width: 1100px) {
+            .intro-layout { grid-template-columns: 1fr; gap: 40px; }
+            .dossier-col { 
+                height: auto; 
+                display: flex; flex-direction: column; align-items: center; gap: 30px; 
+                position: static; 
+                margin-top: 30px;
+            }
+            .video-col { order: 1; }
+            .dossier-col { order: 2; }
+            .data-item { position: static; width: 100%; text-align: center; border: none; padding: 0; margin-bottom: 10px; }
+            .data-item.pos-tl, .data-item.pos-tr, .data-item.pos-bl, .data-item.pos-br {
+                border: none; padding: 0; text-align: center;
+            }
+            .summary-block { padding: 0; width: 90%; }
+            .itch-btn { position: static; transform: none; margin-top: 20px; }
+            .problem-solution-grid { grid-template-columns: 1fr; gap: 40px; }
+            .accordion-item:nth-child(n) { align-self: flex-start; margin: 0; width: 100%; text-align: left; }
+            .accordion-header { align-items: flex-start !important; }
+        }
+
         @media (max-width: 768px) {
             .main-title { font-size: 3rem; white-space: normal; line-height: 0.9; } 
             .project-card { width: 120px; height: 120px; }
             .info-top, .info-bottom { width: 180px; }
             .description-grid { gap: 40px; flex-direction: column; align-items: center; }
             .desc-col { width: 80%; }
+            .acc-title { font-size: 3rem; }
         }
     </style>
 </head>
@@ -452,39 +637,37 @@
     <div class="projects-grid">
         <div class="project-card p1" data-vx="-150" data-vy="-200" data-rz="-15" data-rx="-20" data-stagger="0.0">
             <div class="info-top"><h3 class="info-name">What Makes U a Monster?</h3><p class="info-genre">Point & Click Adventure</p></div>
-            <div class="card-visual">
-                <img src="project1.png" class="card-img" alt="Project 1">
-            </div>
+            <div class="card-visual"><img src="media/project1/project1.png" class="card-img" alt="Project 1"></div>
             <div class="info-bottom"><p class="info-desc">Narrative driven exploration of the human psyche.</p></div>
         </div>
 
         <div class="project-card p2" data-vx="40" data-vy="-250" data-rz="10" data-rx="-25" data-stagger="0.05">
             <div class="info-top"><h3 class="info-name">GPM Diaries</h3><p class="info-genre">Serious Game</p></div>
-            <div class="card-visual"><img src="project2.png" class="card-img" alt="Project 2"></div>
+            <div class="card-visual"><img src="media/project2/project2.png" class="card-img" alt="Project 2"></div>
             <div class="info-bottom"><p class="info-desc">Self-assessment tool gamified for better engagement.</p></div>
         </div>
 
         <div class="project-card p3" data-vx="180" data-vy="-180" data-rz="-18" data-rx="-30" data-stagger="0.02">
             <div class="info-top"><h3 class="info-name">Folc: The Blossom</h3><p class="info-genre">Action RPG</p></div>
-            <div class="card-visual"><img src="project3.png" class="card-img" alt="Project 3"></div>
+            <div class="card-visual"><img src="media/project3/project3.png" class="card-img" alt="Project 3"></div>
             <div class="info-bottom"><p class="info-desc">Fast paced combat in a stylized fantasy world.</p></div>
         </div>
 
         <div class="project-card p4" data-vx="-200" data-vy="150" data-rz="-25" data-rx="20" data-stagger="0.08">
             <div class="info-top"><h3 class="info-name">Fall of Tenochtitlan</h3><p class="info-genre">Boomer Shooter</p></div>
-            <div class="card-visual"><img src="project4.png" class="card-img" alt="Project 4"></div>
+            <div class="card-visual"><img src="media/project4/project4.png" class="card-img" alt="Project 4"></div>
             <div class="info-bottom"><p class="info-desc">High octane retro shooter with modern mechanics.</p></div>
         </div>
 
         <div class="project-card p5" data-vx="-60" data-vy="250" data-rz="28" data-rx="15" data-stagger="0.1">
             <div class="info-top"><h3 class="info-name">Coming Soon</h3><p class="info-genre">Prototype</p></div>
-            <div class="card-visual"><img src="project5.png" class="card-img" alt="Project 5"></div>
+            <div class="card-visual"><img src="media/project5/project5.png" class="card-img" alt="Project 5"></div>
             <div class="info-bottom"><p class="info-desc">Unannounced project currently in development.</p></div>
         </div>
 
         <div class="project-card p6" data-vx="140" data-vy="180" data-rz="12" data-rx="25" data-stagger="0.06">
             <div class="info-top"><h3 class="info-name">Coming Soon</h3><p class="info-genre">R&D</p></div>
-            <div class="card-visual"><img src="project6.png" class="card-img" alt="Project 6"></div>
+            <div class="card-visual"><img src="media/project6/project6.png" class="card-img" alt="Project 6"></div>
             <div class="info-bottom"><p class="info-desc">Research and development for new game systems.</p></div>
         </div>
     </div>
@@ -516,14 +699,142 @@
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
         const overlayTitle = document.getElementById('overlayTitle');
         const overlayGenre = document.getElementById('overlayGenre');
+        const overlayContent = document.querySelector('.overlay-content');
 
-        // --- NEW: INITIAL REVEAL ANIMATION ---
+        // --- PROJECT CONTENT DATA ---
+        const projectData = {
+            "p1": {
+                title: "What Makes U a Monster?",
+                genre: "Point & Click Adventure",
+                content: `
+                    <div class="project-details">
+                        
+                        <div class="intro-layout">
+                            
+                            <div class="video-col">
+                                <div class="video-wrapper">
+                                    <video controls autoplay muted playsinline poster="media/project1/project1.png">
+                                        <source src="media/project1/trailer_p1.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                            
+                            <div class="dossier-col">
+                                
+                                <div class="summary-block">
+                                    <p class="summary-text">A narrative-driven psychological adventure that challenges players to explore a surreal world and uncover hidden truths. As the lead technical designer, I focused on creating immersive systems that bridge the gap between traditional point & click mechanics and modern, tactile gameplay.</p>
+                                </div>
+
+                                <div class="data-item pos-tl"><h4>Role</h4><p>Programmer</p></div>
+                                <div class="data-item pos-tr"><h4>Team Size</h4><p>7 Devs</p></div>
+                                <div class="data-item pos-bl"><h4>Duration</h4><p>4 Months</p></div>
+                                <div class="data-item pos-br"><h4>Engine</h4><p>Unity</p></div>
+
+                                <a href="https://redlight-oracle.itch.io/what-makes-u-a-monster" target="_blank" class="itch-btn">Play on Itch.io</a>
+                            </div>
+
+                        </div>
+
+                        <h2 class="contribution-title">Contribution</h2>
+
+                        <div class="accordion-container">
+                            
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span class="acc-label">THE SYSTEM</span>
+                                    <h3 class="acc-title">Inventory System</h3>
+                                </div>
+                                <div class="accordion-body">
+                                    <div class="feature-block-inner">
+                                        <div class="problem-solution-grid">
+                                            <div class="phase-col">
+                                                <h3 class="phase-header">The Challenge</h3>
+                                                <p class="phase-text">The narrative required players to carry multiple puzzle items, but standard list-based inventories felt clinical. They often pulled the player out of the game world into a spreadsheet, breaking the atmospheric immersion we worked hard to build.</p>
+                                            </div>
+                                            <div class="phase-col">
+                                                <h3 class="phase-header">The Solution</h3>
+                                                <p class="phase-text">I designed a grid-based drag-and-drop system. Players can physically grab items from a customizable hotbar and drag them directly into the scene to solve puzzles. This makes the interface feel like a tangible part of the world rather than an overlay.</p>
+                                                <div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div>
+                                            </div>
+                                        </div>
+                                        <div class="result-video-container">
+                                            <h3 class="result-label">The Result</h3>
+                                            <div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block1_p1.mp4" type="video/mp4"></video></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span class="acc-label">THE BREAK</span>
+                                    <h3 class="acc-title">Boxing Minigame</h3>
+                                </div>
+                                <div class="accordion-body">
+                                    <div class="feature-block-inner">
+                                        <div class="problem-solution-grid">
+                                            <div class="phase-col">
+                                                <h3 class="phase-header">The Challenge</h3>
+                                                <p class="phase-text">The game is a slow-paced psychological narrative. We realized players needed a way to break the tension and release energy without leaving the story context. Constant reading was becoming fatigue-inducing.</p>
+                                            </div>
+                                            <div class="phase-col">
+                                                <h3 class="phase-header">The Solution</h3>
+                                                <p class="phase-text">I prototyped a rhythm-based boxing minigame. By using simple button-mashing inputs that scale in difficulty, we created a spike in engagement. It serves as a narrative device for the character's frustration while giving the player a mechanical break.</p>
+                                                <div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div>
+                                            </div>
+                                        </div>
+                                        <div class="result-video-container">
+                                            <h3 class="result-label">The Result</h3>
+                                            <div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block2_p1.mp4" type="video/mp4"></video></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span class="acc-label">THE WORLD</span>
+                                    <h3 class="acc-title">Interactive World</h3>
+                                </div>
+                                <div class="accordion-body">
+                                    <div class="feature-block-inner">
+                                        <div class="problem-solution-grid">
+                                            <div class="phase-col">
+                                                <h3 class="phase-header">The Challenge</h3>
+                                                <p class="phase-text">Purely visual environments often feel static. We needed the world itself to act as a narrative delivery device without forcing heavy text dumps or cutscenes on the player at every turn.</p>
+                                            </div>
+                                            <div class="phase-col">
+                                                <h3 class="phase-header">The Solution</h3>
+                                                <p class="phase-text">I implemented an interaction system where every object has "discovery" states. Hovering reveals subtle cues, and clicking triggers character thoughts specific to that object's narrative weight, ensuring exploration is always rewarded with story context.</p>
+                                                <div class="sketch-box"><img src="media/project1/sketch_p1.png" class="sketch-img" alt="Sketch"></div>
+                                            </div>
+                                        </div>
+                                        <div class="result-video-container">
+                                            <h3 class="result-label">The Result</h3>
+                                            <div class="video-box-full"><video controls loop muted poster="media/project1/project1.png"><source src="media/project1/block3_p1.mp4" type="video/mp4"></video></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                `
+            },
+
+            // --- PLACEHOLDERS FOR P2 & P3 ---
+            "p2": { title: "GPM Diaries", genre: "Serious Game", content: "<div class='project-details'><div class='video-wrapper'><video controls autoplay muted playsinline poster='media/project2/project2.png'><source src='media/project2/trailer_p2.mp4' type='video/mp4'></video></div><p style='text-align:center;'>Template update coming soon...</p></div>" },
+            "p3": { title: "Folc: The Blossom", genre: "Action RPG", content: "<div class='project-details'><div class='video-wrapper'><video controls autoplay muted playsinline poster='media/project3/project3.png'><source src='media/project3/trailer_p3.mp4' type='video/mp4'></video></div><p style='text-align:center;'>Template update coming soon...</p></div>" },
+            "p4": { title: "Fall of Tenochtitlan", genre: "Boomer Shooter", content: "<div class='project-details'><p style='text-align:center;'>Coming Soon</p></div>" },
+            "p5": { title: "Coming Soon", genre: "Prototype", content: "<div class='project-details'><p style='text-align:center;'>Coming Soon</p></div>" },
+            "p6": { title: "Coming Soon", genre: "R&D", content: "<div class='project-details'><p style='text-align:center;'>Coming Soon</p></div>" }
+        };
+
+        // --- TITLE ANIMATION ---
         function initTitleAnimation() {
-            // 1. Split Text
             const text = mainTitle.innerText;
             mainTitle.innerHTML = '';
-            
-            // 2. Create Masked Spans
             [...text].forEach(char => {
                 if(char === ' ') {
                     const space = document.createElement('span');
@@ -539,76 +850,53 @@
                     mainTitle.appendChild(mask);
                 }
             });
-
-            // 3. Trigger Animations
             setTimeout(() => {
                 const chars = document.querySelectorAll('.char-inner');
-                // Drop the letters
                 chars.forEach((char, i) => {
-                    setTimeout(() => {
-                        char.classList.add('in-view');
-                    }, i * 35);
+                    setTimeout(() => { char.classList.add('in-view'); }, i * 35);
                 });
-
-                // Wait for letters to finish before starting subtitle
                 const delayForSubtitle = chars.length * 35 + 100;
-
                 setTimeout(() => {
-                    // Start Subtitle (Technical Game Designer)
                     if(lowerTag) lowerTag.classList.add('show');
-
-                    // Start Button with 500ms delay after subtitle starts
-                    setTimeout(() => {
-                        if(enterBtn) enterBtn.classList.add('show');
-                    }, 500);
-
+                    setTimeout(() => { if(enterBtn) enterBtn.classList.add('show'); }, 500);
                 }, delayForSubtitle);
-                
-            }, 300); // Initial start delay
+            }, 300);
         }
 
-        // --- AUTOMATIC CLONING SCRIPT FOR FILL EFFECT ---
+        // --- PROJECTS ANIMATION (FILL) ---
         projects.forEach(card => {
             const visual = card.querySelector('.card-visual');
             const img = card.querySelector('.card-img');
-            
             if(visual && img) {
                 const wrapper = document.createElement('div');
                 wrapper.classList.add('icon-wrapper');
-                
                 const fillBox = document.createElement('div');
                 fillBox.classList.add('fill-box');
-                
                 const fillImg = img.cloneNode(true);
                 fillImg.classList.remove('card-img');
                 fillImg.classList.add('fill-img');
-                
                 fillBox.appendChild(fillImg);
-                
                 visual.appendChild(wrapper);
                 wrapper.appendChild(img);
                 wrapper.appendChild(fillBox);
             }
         });
 
-        // --- INTERACTION ANIMATION LOGIC (EXPLORE CLICK) ---
+        // --- RENDER SCENE ---
         function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
         function getSubProgress(t, start, end) {
             if (t <= start) return 0;
             if (t >= end) return 1;
             return (t - start) / (end - start);
         }
-
         function renderScene(globalT) {
             const titleT = getSubProgress(globalT, 0.0, 0.7);
             if(mainTitle) mainTitle.style.transform = `scale(${1 + easeOutCubic(titleT) * 0.6})`;
-            
             const lowerT = getSubProgress(globalT, 0.0, 0.6);
             if(lowerTag) {
                 lowerTag.style.opacity = Math.max(0, 0.8 - easeOutCubic(lowerT));
                 lowerTag.style.transform = `translateY(${easeOutCubic(lowerT) * 40}px)`;
             }
-
             const upperT = getSubProgress(globalT, 0.2, 0.8);
             const upperEase = easeOutCubic(upperT);
             if(upperTag) {
@@ -616,13 +904,11 @@
                 upperTag.style.transform = `translateY(${-50 * (1 - upperEase)}px)`;
                 upperTag.style.setProperty('--line-width', `${80 * upperEase}px`);
             }
-
             const descT = getSubProgress(globalT, 0.3, 1.0);
             const descEase = easeOutCubic(descT);
             if(descGrid) descGrid.style.opacity = descEase * 0.8;
             if(descLeft) descLeft.style.transform = `translateX(${-50 * (1 - descEase)}px)`;
             if(descRight) descRight.style.transform = `translateX(${50 * (1 - descEase)}px)`;
-
             const projectsEase = easeOutCubic(globalT);
             projects.forEach((p) => {
                 const stagger = parseFloat(p.getAttribute('data-stagger'));
@@ -638,35 +924,19 @@
                 const currentScale = 1 + (3.5 * invLocal);
                 const currentRotZ = invLocal * rzBase;
                 const currentRotX = invLocal * rxBase;
-
                 p.style.opacity = localProgress;
-                p.style.transform = `
-                    translate3d(${offsetX + curveX}px, ${offsetY}px, 0) 
-                    scale(${currentScale})
-                    rotateZ(${currentRotZ}deg)
-                    rotateX(${currentRotX}deg)
-                `;
-
-                if (localProgress >= 0.99) p.classList.add('active');
-                else p.classList.remove('active');
+                p.style.transform = `translate3d(${offsetX + curveX}px, ${offsetY}px, 0) scale(${currentScale}) rotateZ(${currentRotZ}deg) rotateX(${currentRotX}deg)`;
+                if (localProgress >= 0.99) p.classList.add('active'); else p.classList.remove('active');
             });
         }
-
         renderScene(0);
-
         window.addEventListener('DOMContentLoaded', initTitleAnimation);
-
         enterBtn.addEventListener('click', () => {
-            // LOCK THE HOVER STYLE
             enterBtn.classList.add('clicked');
-            
-            // New "Fly Into Screen" Effect
-            // Overwrite transitions for the scale effect
             enterBtn.style.transition = "transform 0.33s ease-out, opacity 0.33s ease-out";
             enterBtn.style.transform = "scale(1.5)";
             enterBtn.style.opacity = '0';
             enterBtn.style.pointerEvents = 'none';
-            
             let startTime = null;
             const duration = 1500; 
             function step(timestamp) {
@@ -679,15 +949,44 @@
             requestAnimationFrame(step);
         });
 
+        // --- INITIALIZE OVERLAY INTERACTIONS ---
+        function initOverlayInteractions() {
+            const items = document.querySelectorAll('.accordion-item');
+            items.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    items.forEach(other => {
+                        if(other !== item) other.classList.remove('is-open');
+                    });
+                    item.classList.toggle('is-open');
+                });
+            });
+        }
+
+        // --- PROJECT CLICK (UPDATED) ---
         projects.forEach(card => {
             card.addEventListener('click', () => {
                 if(!card.classList.contains('active')) return;
-                const title = card.querySelector('.info-name').innerText;
-                const genre = card.querySelector('.info-genre').innerText;
-                overlayTitle.innerText = title;
-                overlayGenre.innerText = genre;
-                transitionLayer.classList.add('is-open');
-                overlay.classList.add('is-open');
+
+                let projectKey = null;
+                card.classList.forEach(cls => {
+                    if(projectData[cls]) projectKey = cls;
+                });
+
+                if(projectKey) {
+                    const data = projectData[projectKey];
+                    overlayTitle.innerText = data.title;
+                    overlayGenre.innerText = data.genre; 
+                    
+                    // Inject Content
+                    overlayContent.innerHTML = data.content; 
+                    
+                    // Init Accordion
+                    initOverlayInteractions();
+
+                    transitionLayer.classList.add('is-open');
+                    overlay.classList.add('is-open');
+                }
             });
         });
 
