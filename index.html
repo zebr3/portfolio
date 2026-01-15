@@ -21,22 +21,8 @@
             --primary-font: 'Onyx', serif; 
             --secondary-font: 'Montserrat', sans-serif;
             
-            /* --- RESPONSIVE SCALING LOGIC --- */
-            /* Logic: Use the Fixed pixel value (ideal for 4K), 
-               but shrink if the viewport is small (vmin). */
-
-            /* 1. Base Text: Max 16px, but shrinks on very small screens */
-            --base-size: min(16px, 2vmin);
-
-            /* 2. Header: Max 9.5rem, but shrinks relative to width on laptops */
-            --header-size: min(9.5rem, 13vw); 
-
-            /* 3. Card Size: THE FIX
-               - On 4K: 18vmin is huge (~400px), so it caps at 180px.
-               - On 1080p: 18vmin is ~190px, so it caps at 180px.
-               - On Laptop (768p height): 18vmin is ~138px. It uses 138px.
-               This prevents vertical overlaps on small screens. */
-            --card-size: min(180px, 18vmin);
+            --header-size: clamp(3.5rem, 11vw, 9.5rem); 
+            --base-size: 16px;
 
             --bg-color: #ece0c6;        
             --primary-color: #1d1d1d;   
@@ -46,6 +32,7 @@
             --card-bg: #f4ebd6;         
             --card-border: #dcd2bb;      
 
+            --card-size: 180px; 
             --gap-portfolio-title: 50px;
             --gap-title-desc: 25px;
             --project-text-gap: 3px;
@@ -62,7 +49,7 @@
 
         html { 
             min-height: 100%; 
-            font-size: var(--base-size); 
+            font-size: var(--base-size);
             scrollbar-color: var(--primary-color) var(--bg-color);
             scrollbar-width: thin;
         }
@@ -402,24 +389,35 @@
         /* --- OVERLAY CONTENT STYLES (PRELOADED) --- */
         .project-details {
             width: 100%; max-width: 1600px; 
+            /* Start HIDDEN (Display None prevents interaction/layout issues) */
             display: none; 
             opacity: 0; 
             transform: translateY(20px);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
         
-        .project-details.active { display: block; }
-        .project-details.visible { opacity: 1; transform: translateY(0); }
+        /* When ACTIVE, we switch to block and fade in */
+        .project-details.active {
+            display: block; 
+        }
+        
+        /* We separate display:block from the fade-in to allow transition */
+        .project-details.visible {
+            opacity: 1; 
+            transform: translateY(0);
+        }
 
         /* --- THE "ORBIT" LAYOUT --- */
         .intro-layout {
             display: grid;
+            /* 2fr Video | 1.2fr Orbit Space */
             grid-template-columns: 2fr 1.2fr; 
             gap: 40px;
             margin: 0 0 80px 0;
             align-items: stretch; 
         }
 
+        /* 1. Video Column */
         .video-col { width: 100%; }
         
         .video-wrapper {
@@ -429,36 +427,54 @@
             border: 1px solid var(--accent-color);
             box-shadow: 15px 15px 0px rgba(240, 106, 83, 0.15); 
         }
+        /* Style for video AND placeholder image */
         .video-wrapper video,
         .video-wrapper img.placeholder-img {
-            width: 100%; height: 100%; 
-            object-fit: cover; display: block;
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block;
         }
 
+        /* 2. Orbit Dossier Column */
         .dossier-col {
             position: relative;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
             min-height: 100%; 
         }
 
+        /* The Sun: Summary Block */
         .summary-block {
-            text-align: center; width: 100%; max-width: 100%; 
-            z-index: 2; padding: 20px 0; 
+            text-align: center;
+            width: 100%; 
+            max-width: 100%; 
+            z-index: 2;
+            padding: 20px 0; 
         }
         .summary-text {
              font-family: var(--secondary-font); 
-             font-size: 0.95rem; line-height: 1.7; 
+             font-size: 0.95rem;
+             line-height: 1.7; 
              color: var(--primary-color); 
-             text-transform: none; font-weight: 500; margin: 0;
+             text-transform: none; 
+             font-weight: 500;
+             margin: 0;
         }
 
+        /* The Planets: Core Data */
         .data-item {
-            position: absolute; width: max-content;
+            position: absolute;
+            width: max-content;
+            /* GLOBAL: Left Border + Left Align */
             border-left: 2px solid var(--accent-color);
-            padding-left: 15px; text-align: left;
+            padding-left: 15px;
+            text-align: left;
         }
         
+        /* Positioning */
         .pos-tl { top: 20%; left: 3%; }
         .pos-tr { top: 25%; right: 8%; }
         .pos-bl { bottom: 25%; left: 1%; }
@@ -474,8 +490,11 @@
             color: var(--primary-color); line-height: 0.9;
         }
 
+        /* Button: Bottom Center */
         .itch-btn {
-            position: absolute; bottom: 20px; left: 50%;
+            position: absolute;
+            bottom: 20px; 
+            left: 50%;
             transform: translateX(-50%);
             display: inline-block; text-decoration: none;
             padding: 15px 40px;
@@ -485,30 +504,42 @@
             font-size: 0.85rem; letter-spacing: 3px;
             text-transform: uppercase;
             border: 1px solid var(--accent-color);
-            transition: all 0.3s ease; white-space: nowrap;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
         .itch-btn:hover {
             background: transparent; color: var(--accent-color);
             letter-spacing: 5px;
         }
 
+        /* --- CONTRIBUTION HEADER (FIXED WIDTH) --- */
         .contribution-title {
             font-family: var(--secondary-font); 
-            font-size: 1rem; letter-spacing: 4px; 
-            color: var(--accent-color); text-transform: uppercase;
-            text-align: center; margin: 0 0 40px 0; 
-            display: flex; align-items: center; justify-content: center;
-            gap: 20px; width: 100%;
+            font-size: 1rem; 
+            letter-spacing: 4px; 
+            color: var(--accent-color); 
+            text-transform: uppercase;
+            text-align: center;
+            margin: 0 0 40px 0; 
+            display: flex; align-items: center; 
+            justify-content: center;
+            gap: 20px; 
+            width: 100%;
         }
 
         .contribution-title::before, .contribution-title::after {
-            content: ""; height: 1px; width: 360px; 
-            background-color: var(--accent-color); opacity: 0.5;
+            content: ""; 
+            height: 1px; 
+            width: 360px; /* FIXED WIDTH */
+            background-color: var(--accent-color); 
+            opacity: 0.5;
         }
 
+        /* --- SCATTERED ACCORDION STYLES --- */
         .accordion-container { display: flex; flex-direction: column; gap: 80px; padding-bottom: 100px; }
         .accordion-item { width: auto; display: flex; flex-direction: column; border: none; }
         
+        /* UPDATED MARGINS */
         .accordion-item:nth-child(1) { align-self: flex-start; margin-left: 18%; }
         .accordion-item:nth-child(2) { align-self: flex-end; margin-right: 2%; text-align: right; }
         .accordion-item:nth-child(2) .accordion-header { align-items: flex-start; }
@@ -527,13 +558,18 @@
         .accordion-header:hover .acc-label { transform: translateX(25px); color: var(--accent-color); }
         .accordion-item.is-open .accordion-body { max-height: 2000px; opacity: 1; margin-top: 40px; }
         
+        /* PERFORMANCE BOOST: Content Visibility */
         .accordion-body {
             max-height: 0; opacity: 0; overflow: hidden;
             transition: max-height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
             text-align: left; width: 100%; max-width: 800px; 
-            content-visibility: auto; contain-intrinsic-size: 0 500px;
+            
+            /* Optimization: Don't render offscreen content until needed */
+            content-visibility: auto; 
+            contain-intrinsic-size: 0 500px;
         }
 
+        /* Content Layout */
         .feature-block-inner { padding-top: 20px; border-top: 1px solid var(--accent-color); }
         .problem-solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
         .phase-col { display: flex; flex-direction: column; gap: 20px; }
@@ -573,7 +609,8 @@
             .dossier-col { 
                 height: auto; 
                 display: flex; flex-direction: column; align-items: center; gap: 30px; 
-                position: static; margin-top: 30px;
+                position: static; 
+                margin-top: 30px;
             }
             .video-col { order: 1; }
             .dossier-col { order: 2; }
@@ -590,10 +627,7 @@
 
         @media (max-width: 768px) {
             .main-title { font-size: 3rem; white-space: normal; line-height: 0.9; } 
-            .project-card { 
-                /* Reset to variable, or set specific small size if variable fails */
-                width: var(--card-size); height: var(--card-size); 
-            }
+            .project-card { width: 120px; height: 120px; }
             .info-top, .info-bottom { width: 180px; }
             .description-grid { gap: 40px; flex-direction: column; align-items: center; }
             .desc-col { width: 80%; }
